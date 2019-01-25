@@ -1,8 +1,33 @@
-require 'bcript'
+# require_relative 'crud' user this sytax if module is in same directory
+##### otherwise...
+# $ LOAD_PATH << "."
+#require 'crud'
 
-def create_hash_password(password)
-  BCrypt::Password.create(password)
+module Crud
+  require 'bcrypt'
+  puts "Module crud activated"
+
+  def self.create_hash_digest(password)
+    BCrypt::Password.create(password)
+  end
+
+  def self.verify_hash_digest(password)
+    BCrypt::Password.new(password)
+  end
+
+  def self.create_secure_users(list_of_users)
+    list_of_users.each do |user_record|
+      user_record[:password] = create_hash_digest(user_record[:password])
+    end
+    list_of_users
+  end
+
+  def self.authenticate_user(username, password, list_of_users)
+    list_of_users.each do |user_record|
+      if user_record[:username] == username && verify_hash_digest(user_record[:password]) == password
+        return user_record
+      end
+    end
+    "Credentials were not correct"
+  end
 end
-
-new_password = create_hash_password('password1')
-puts new_password =='password1'
